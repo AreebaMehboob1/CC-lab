@@ -1,1 +1,49 @@
+def is_valid_c_variable(variable):
+    """
+    Determines if the given string is a valid C variable name using DFA.
+    """
+    # States
+    START = 0
+    VALID_START = 1
+    VALID_CONTINUATION = 2
+    INVALID = -1
+
+    # Initialize state
+    state = START
+
+    for i, char in enumerate(variable):
+        if state == START:
+            # Transition from START to VALID_START
+            if char.isalpha() or char == '_':
+                state = VALID_START
+            else:
+                state = INVALID
+                break
+        elif state in {VALID_START, VALID_CONTINUATION}:
+            # Transition from VALID_START/VALID_CONTINUATION to VALID_CONTINUATION
+            if char.isalnum() or char == '_':
+                state = VALID_CONTINUATION
+            else:
+                state = INVALID
+                break
+
+    # Valid if we end in VALID_START or VALID_CONTINUATION
+    return state in {VALID_START, VALID_CONTINUATION}
+
+
+# Test the DFA
+test_cases = [
+    "variable",    # Valid
+    "_var123",     # Valid
+    "1variable",   # Invalid (cannot start with a digit)
+    "my-var",      # Invalid (contains a hyphen)
+    "int",         # Valid (keywords not checked here)
+    "__test__",    # Valid
+    "a",           # Valid (single character)
+    "123",         # Invalid (starts with a digit)
+]
+
+for test in test_cases:
+    result = "Valid" if is_valid_c_variable(test) else "Invalid"
+    print(f"'{test}': {result}")
 
